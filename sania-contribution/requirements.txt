@@ -1,0 +1,7 @@
+pydantic
+langgraph
+streamlit
+pytest
+pypdf
+python-docx
+openpyxl

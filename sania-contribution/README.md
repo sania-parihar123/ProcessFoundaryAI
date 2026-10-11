@@ -18,16 +18,20 @@ HITL clarification and approval, requirements and artifact generation, and
 traceability/workflow audit remain teammate-owned modules. This contribution
 directory contains no implementation of those modules.
 
-Member 1's backend and Member 2's document processing, evidence extraction,
-As-Is discovery, and business-rule extraction remain outside this directory.
+Member 1's backend and persistence remain outside this directory. Local
+document parsing for PDF, DOCX, TXT, and XLSX files plus deterministic
+scholarship evidence extraction are provided under `app/agents/`; OCR, LLM
+extraction, and production source persistence
+remain outside this directory.
 
 ## Current scope
 
-The current implementation contains the process-neutral `ProcessFoundryState`
-model in `app/graph/state.py` and focused tests in `tests/test_state.py`.
-Graph construction, nodes, routing, retries, analysis services, UI pages, and
-external integration adapters will be added only as their specifications are
-approved.
+The current implementation contains the process-neutral
+`ProcessFoundryState` model, deterministic gap/conflict analysis, local
+PDF/DOCX/TXT/XLSX ingestion, provenance-preserving scholarship evidence extraction,
+the analysis graph, and a Streamlit upload path. Upload processing is
+in-memory, limited to supported text extraction, and does not implement OCR,
+authentication, persistence, HITL, or approval.
 
 ## Repository layout
 
