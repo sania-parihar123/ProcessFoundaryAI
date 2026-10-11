@@ -1,0 +1,52 @@
+{
+  "requirements": [
+    {
+      "requirement_id": "demo-project-REQ-001",
+      "statement": "The system shall enforce: Only eligible students may apply.",
+      "evidence_ids": [
+        "demo-project-EVD-002"
+      ],
+      "related_rule_ids": [
+        "demo-project-BR-001"
+      ]
+    },
+    {
+      "requirement_id": "demo-project-REQ-006",
+      "statement": "The system shall enforce: submit before 31 March.",
+      "evidence_ids": [
+        "demo-project-EVD-010"
+      ],
+      "related_rule_ids": [
+        "demo-project-BR-006"
+      ]
+    },
+    {
+      "requirement_id": "demo-project-REQ-013",
+      "statement": "The process shall include the step: Fill online application form",
+      "evidence_ids": [
+        "demo-project-EVD-001"
+      ],
+      "related_step_ids": [
+        "demo-project-STEP-001"
+      ]
+    },
+    {
+      "requirement_id": "demo-project-REQ-016",
+      "statement": "The process shall include the step: Return incomplete applications",
+      "evidence_ids": [
+        "demo-project-EVD-007"
+      ],
+      "related_step_ids": [
+        "demo-project-STEP-004"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "test_id": "test_deadline_enforced",
+      "requirement_ids": [
+        "demo-project-REQ-006"
+      ]
+    }
+  ]
+}

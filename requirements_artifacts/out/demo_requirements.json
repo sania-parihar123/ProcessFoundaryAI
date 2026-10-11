@@ -1,0 +1,445 @@
+{
+  "schema_version": "0.1",
+  "project_id": "demo-project",
+  "requirements": [
+    {
+      "id": "demo-project-REQ-001",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Only eligible students may apply for the scholarship.",
+      "statement": "The system shall enforce: Only eligible students may apply for the scholarship.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-001"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-002"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-002",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "A student must be enrolled in a full-time",
+      "statement": "The system shall enforce: A student must be enrolled in a full-time undergraduate programme at the institute.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-002"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-003"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-003",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "The student must have a cumulative grade point",
+      "statement": "The system shall enforce: The student must have a cumulative grade point average (CGPA) of at least 8.0 in the previous academic year.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-003"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-004"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-004",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "The annual family income of the student must",
+      "statement": "The system shall enforce: The annual family income of the student must not exceed 5,00,000 rupees.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-004"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-005"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-005",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Students who have already received another scholarship from",
+      "statement": "The system shall enforce: Students who have already received another scholarship from the institute in the same academic year cannot apply.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-005"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-006"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-006",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Applications must be submitted before 31 March of",
+      "statement": "The system shall enforce: Applications must be submitted before 31 March of each year.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-006"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-007"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-007",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Applications received after this date will not be",
+      "statement": "The system shall enforce: Applications received after this date will not be accepted.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-007"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-008"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-008",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "The online application portal opens on 1 February.",
+      "statement": "The system shall enforce: The online application portal opens on 1 February.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-008"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-020"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-009",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "The last date to submit the scholarship application",
+      "statement": "The system shall enforce: The last date to submit the scholarship application is 15 April.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-009"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-021"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-010",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Students are informed about the result through the",
+      "statement": "The system shall enforce: Students are informed about the result through the portal.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-010"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-024"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-011",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Students who are not selected are not sent",
+      "statement": "The system shall enforce: Students who are not selected are not sent any separate message.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-011"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-025"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-012",
+      "project_id": "demo-project",
+      "req_type": "functional",
+      "title": "Questions about the scholarship should be sent to",
+      "statement": "The system shall enforce: Questions about the scholarship should be sent to the Scholarship Office of the institute.",
+      "priority": "Must",
+      "rule_ids": [
+        "demo-project-BR-012"
+      ],
+      "step_ids": [],
+      "evidence_ids": [
+        "demo-project-EVD-026"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-013",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Fill online application form",
+      "statement": "The process shall include the step: Fill online application form performed by student",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-001"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-009"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-014",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Upload required documents",
+      "statement": "The process shall include the step: Upload required documents performed by student",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-002"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-010"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-015",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Check form and documents",
+      "statement": "The process shall include the step: Check form and documents performed by scholarship clerk",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-003"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-011"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-016",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Return incomplete applications",
+      "statement": "The process shall include the step: Return incomplete applications",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-004"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-012"
+      ],
+      "status": "needs_clarification",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-017",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Verify form",
+      "statement": "The process shall include the step: Verify form",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-005"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-013"
+      ],
+      "status": "needs_clarification",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-018",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Check documents for genuineness",
+      "statement": "The process shall include the step: Check documents for genuineness performed by scholarship clerk",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-006"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-014"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-019",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Review application and recommend",
+      "statement": "The process shall include the step: Review application and recommend performed by Head of Department (HOD)",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-007"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-015"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-020",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Review applications and select awardees",
+      "statement": "The process shall include the step: Review applications and select awardees performed by Scholarship Committee",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-008"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-016"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-021",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Transfer scholarship amount",
+      "statement": "The process shall include the step: Transfer scholarship amount performed by Accounts Office",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-009"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-017"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-022",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Receive scholarship amount",
+      "statement": "The process shall include the step: Receive scholarship amount performed by Each selected student",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-010"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-018"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-023",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Pay amount in single instalment",
+      "statement": "The process shall include the step: Pay amount in single instalment",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-011"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-019"
+      ],
+      "status": "needs_clarification",
+      "acceptance_criteria": []
+    },
+    {
+      "id": "demo-project-REQ-024",
+      "project_id": "demo-project",
+      "req_type": "workflow",
+      "title": "Meet and display awardees list",
+      "statement": "The process shall include the step: Meet and display awardees list performed by Scholarship Committee",
+      "priority": "Should",
+      "rule_ids": [],
+      "step_ids": [
+        "demo-project-STEP-012"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-022",
+        "demo-project-EVD-023"
+      ],
+      "status": "draft",
+      "acceptance_criteria": []
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "demo-project-Q-001",
+      "project_id": "demo-project",
+      "question": "Who performs this step: Return incomplete applications?",
+      "reason": "actor not stated in source",
+      "related_ids": [
+        "demo-project-STEP-004"
+      ]
+    },
+    {
+      "id": "demo-project-Q-002",
+      "project_id": "demo-project",
+      "question": "Who performs this step: Verify form?",
+      "reason": "actor not stated in source",
+      "related_ids": [
+        "demo-project-STEP-005"
+      ]
+    },
+    {
+      "id": "demo-project-Q-003",
+      "project_id": "demo-project",
+      "question": "Who performs this step: Pay amount in single instalment?",
+      "reason": "actor not stated in source",
+      "related_ids": [
+        "demo-project-STEP-011"
+      ]
+    }
+  ],
+  "warnings": []
+}
