@@ -1,0 +1,154 @@
+{
+  "project_id": "demo-project",
+  "evidence_items": [
+    {
+      "evidence_id": "demo-project-EVD-001",
+      "claim": "Student fills online application form"
+    },
+    {
+      "evidence_id": "demo-project-EVD-002",
+      "claim": "Only eligible students may apply"
+    },
+    {
+      "evidence_id": "demo-project-EVD-007",
+      "claim": "Incomplete applications are returned"
+    },
+    {
+      "evidence_id": "demo-project-EVD-010",
+      "claim": "Applications must be submitted before 31 March"
+    },
+    {
+      "evidence_id": "demo-project-EVD-013",
+      "claim": "The last date to submit is 15 April"
+    },
+    {
+      "evidence_id": "demo-project-EVD-030",
+      "claim": "Footnote about fonts"
+    }
+  ],
+  "as_is_process": {
+    "steps": [
+      {
+        "step_id": "demo-project-STEP-001",
+        "name": "Fill online application form",
+        "actor": "student",
+        "evidence_ids": [
+          "demo-project-EVD-001"
+        ]
+      },
+      {
+        "step_id": "demo-project-STEP-004",
+        "name": "Return incomplete applications",
+        "actor": null,
+        "evidence_ids": [
+          "demo-project-EVD-007"
+        ]
+      }
+    ]
+  },
+  "candidate_business_rules": [
+    {
+      "rule_id": "demo-project-BR-001",
+      "statement": "Only eligible students may apply.",
+      "evidence_ids": [
+        "demo-project-EVD-002"
+      ]
+    },
+    {
+      "rule_id": "demo-project-BR-006",
+      "statement": "Applications must be submitted before 31 March.",
+      "evidence_ids": [
+        "demo-project-EVD-010"
+      ]
+    },
+    {
+      "rule_id": "demo-project-BR-009",
+      "statement": "The last date to submit is 15 April.",
+      "evidence_ids": [
+        "demo-project-EVD-013"
+      ]
+    }
+  ],
+  "gap_issues": [
+    {
+      "issue_id": "demo-project-ISS-001",
+      "description": "No actor for returning applications",
+      "step_ids": [
+        "demo-project-STEP-004"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-007"
+      ]
+    }
+  ],
+  "conflict_issues": [
+    {
+      "issue_id": "demo-project-ISS-002",
+      "description": "Deadline 31 March vs 15 April",
+      "rule_ids": [
+        "demo-project-BR-006",
+        "demo-project-BR-009"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-010",
+        "demo-project-EVD-013"
+      ]
+    }
+  ],
+  "clarification_questions": [
+    {
+      "question_id": "demo-project-Q-001",
+      "text": "Who performs: Return incomplete applications?",
+      "step_ids": [
+        "demo-project-STEP-004"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-007"
+      ],
+      "created_at": "2026-10-11T12:00:00+00:00"
+    },
+    {
+      "question_id": "demo-project-Q-002",
+      "text": "Which deadline is correct?",
+      "rule_ids": [
+        "demo-project-BR-006",
+        "demo-project-BR-009"
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-010"
+      ],
+      "created_at": "2026-10-11T12:00:00+00:00"
+    }
+  ],
+  "human_answers": [
+    {
+      "answer_id": "demo-project-ANS-001",
+      "question_id": "demo-project-Q-001",
+      "answer_text": "Scholarship clerk",
+      "answered_by": "Dr. Rao",
+      "role": "process_owner",
+      "answered_at": "2026-10-11T12:30:00+00:00"
+    },
+    {
+      "answer_id": "demo-project-ANS-002",
+      "question_id": "demo-project-Q-002",
+      "answer_text": "31 March",
+      "answered_by": "Dr. Rao",
+      "role": "process_owner",
+      "answered_at": "2026-10-11T12:31:00+00:00"
+    }
+  ],
+  "decisions": [
+    {
+      "decision_id": "demo-project-DEC-001",
+      "subject": "requirements",
+      "decision": "approve",
+      "decided_by": "Dr. Rao",
+      "role": "approver",
+      "reason": "Reviewed",
+      "decided_at": "2026-10-11T12:40:00+00:00"
+    }
+  ],
+  "pending_question_ids": [],
+  "approval_status": "approved"
+}
