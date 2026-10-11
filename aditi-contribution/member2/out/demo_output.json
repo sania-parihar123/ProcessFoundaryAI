@@ -1,0 +1,671 @@
+{
+  "schema_version": "0.1",
+  "project_id": "demo-project",
+  "document_id": "DOC-DEMO",
+  "sections": [
+    {
+      "id": "DOC-DEMO-S001",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "RIVERDALE INSTITUTE OF TECHNOLOGY",
+      "text": "MERIT EXCELLENCE SCHOLARSHIP - STANDARD OPERATING PROCEDURE\n(SYNTHETIC SAMPLE DOCUMENT FOR TESTING. NOT A REAL POLICY. ALL DETAILS ARE FICTIONAL.)"
+    },
+    {
+      "id": "DOC-DEMO-S002",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "1. PURPOSE",
+      "text": "The Merit Excellence Scholarship supports students of Riverdale Institute of Technology who show strong academic results and need financial help. This document describes how a student applies, how the application is checked, and how the scholarship is awarded."
+    },
+    {
+      "id": "DOC-DEMO-S003",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "2. ELIGIBILITY",
+      "text": "Only eligible students may apply for the scholarship. A student must be enrolled in a full-time undergraduate programme at the institute. The student must have a cumulative grade point average (CGPA) of at least 8.0 in the previous academic year. The annual family income of the student must not exceed 5,00,000 rupees. Students who have already received another scholarship from the institute in the same academic year cannot apply."
+    },
+    {
+      "id": "DOC-DEMO-S004",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "3. APPLICATION DEADLINE",
+      "text": "Applications must be submitted before 31 March of each year. Applications received after this date will not be accepted."
+    },
+    {
+      "id": "DOC-DEMO-S005",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "4. APPLICATION PROCEDURE",
+      "text": "Step 1. The student fills in the online scholarship application form on the institute portal.\n\nStep 2. The student uploads the following documents: the previous year mark sheet, the family income certificate, and a copy of the student identity card.\n\nStep 3. The scholarship clerk checks that the form is complete and that all required documents are attached. Incomplete applications are returned to the student with a note about what is missing.\n\nStep 4. The form is verified.\n\nStep 5. The scholarship clerk checks the documents again and confirms that the mark sheet and the income certificate are genuine.\n\nStep 6. The Head of Department (HOD) reviews each verified application and adds a written recommendation.\n\nStep 7. The Scholarship Committee meets once a year, reviews all recommended applications, and selects the final list of awardees based on merit.\n\nStep 8. The Accounts Office transfers the scholarship amount to the bank account of each selected student."
+    },
+    {
+      "id": "DOC-DEMO-S006",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "5. SCHOLARSHIP AMOUNT",
+      "text": "Each selected student receives a scholarship of 40,000 rupees per academic year. The amount is paid in a single instalment."
+    },
+    {
+      "id": "DOC-DEMO-S007",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "6. IMPORTANT DATES",
+      "text": "The online application portal opens on 1 February. The last date to submit the scholarship application is 15 April. The Scholarship Committee meets in the first week of June. The final list of awardees is displayed on the institute notice board and portal after the committee meeting."
+    },
+    {
+      "id": "DOC-DEMO-S008",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "7. COMMUNICATION",
+      "text": "Students are informed about the result through the portal. Students who are not selected are not sent any separate message."
+    },
+    {
+      "id": "DOC-DEMO-S009",
+      "document_id": "DOC-DEMO",
+      "page_number": null,
+      "section_title": "8. CONTACT",
+      "text": "Questions about the scholarship should be sent to the Scholarship Office of the institute."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "demo-project-EVD-001",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S002",
+      "quote": "The Merit Excellence Scholarship supports students of Riverdale Institute of Technology who show strong academic results and need financial help.",
+      "claim_type": "actor",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-002",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S003",
+      "quote": "Only eligible students may apply for the scholarship.",
+      "claim_type": "rule",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-003",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S003",
+      "quote": "A student must be enrolled in a full-time undergraduate programme at the institute.",
+      "claim_type": "rule",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-004",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S003",
+      "quote": "The student must have a cumulative grade point average (CGPA) of at least 8.0 in the previous academic year.",
+      "claim_type": "rule",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-005",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S003",
+      "quote": "The annual family income of the student must not exceed 5,00,000 rupees.",
+      "claim_type": "rule",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-006",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S003",
+      "quote": "Students who have already received another scholarship from the institute in the same academic year cannot apply.",
+      "claim_type": "rule",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-007",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S004",
+      "quote": "Applications must be submitted before 31 March of each year.",
+      "claim_type": "deadline",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-008",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S004",
+      "quote": "Applications received after this date will not be accepted.",
+      "claim_type": "rule",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-009",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The student fills in the online scholarship application form on the institute portal.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-010",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The student uploads the following documents: the previous year mark sheet, the family income certificate, and a copy of the student identity card.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-011",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The scholarship clerk checks that the form is complete and that all required documents are attached.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-012",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "Incomplete applications are returned to the student with a note about what is missing.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-013",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The form is verified.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-014",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The scholarship clerk checks the documents again and confirms that the mark sheet and the income certificate are genuine.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-015",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The Head of Department (HOD) reviews each verified application and adds a written recommendation.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-016",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The Scholarship Committee meets once a year, reviews all recommended applications, and selects the final list of awardees based on merit.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-017",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S005",
+      "quote": "The Accounts Office transfers the scholarship amount to the bank account of each selected student.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-018",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S006",
+      "quote": "Each selected student receives a scholarship of 40,000 rupees per academic year.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-019",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S006",
+      "quote": "The amount is paid in a single instalment.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-020",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S007",
+      "quote": "The online application portal opens on 1 February.",
+      "claim_type": "deadline",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-021",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S007",
+      "quote": "The last date to submit the scholarship application is 15 April.",
+      "claim_type": "deadline",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-022",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S007",
+      "quote": "The Scholarship Committee meets in the first week of June.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-023",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S007",
+      "quote": "The final list of awardees is displayed on the institute notice board and portal after the committee meeting.",
+      "claim_type": "step",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-024",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S008",
+      "quote": "Students are informed about the result through the portal.",
+      "claim_type": "form",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-025",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S008",
+      "quote": "Students who are not selected are not sent any separate message.",
+      "claim_type": "form",
+      "confidence": "0.90"
+    },
+    {
+      "id": "demo-project-EVD-026",
+      "project_id": "demo-project",
+      "document_section_id": "DOC-DEMO-S009",
+      "quote": "Questions about the scholarship should be sent to the Scholarship Office of the institute.",
+      "claim_type": "form",
+      "confidence": "0.90"
+    }
+  ],
+  "steps": [
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-001",
+      "name": "Fill online application form",
+      "actor": "student",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-002",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-009"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-002",
+      "name": "Upload required documents",
+      "actor": "student",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-003",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-010"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-003",
+      "name": "Check form and documents",
+      "actor": "scholarship clerk",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-004",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-011"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-004",
+      "name": "Return incomplete applications",
+      "actor": null,
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-005",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-012"
+      ],
+      "unknowns": [
+        "actor not stated in source"
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-005",
+      "name": "Verify form",
+      "actor": null,
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-006",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-013"
+      ],
+      "unknowns": [
+        "actor not stated in source"
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-006",
+      "name": "Check documents for genuineness",
+      "actor": "scholarship clerk",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-007",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-014"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-007",
+      "name": "Review application and recommend",
+      "actor": "Head of Department (HOD)",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-008",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-015"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-008",
+      "name": "Review applications and select awardees",
+      "actor": "Scholarship Committee",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-009",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-016"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-009",
+      "name": "Transfer scholarship amount",
+      "actor": "Accounts Office",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-010",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-017"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-010",
+      "name": "Receive scholarship amount",
+      "actor": "Each selected student",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-011",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-018"
+      ],
+      "unknowns": []
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-011",
+      "name": "Pay amount in single instalment",
+      "actor": null,
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [
+        {
+          "to_step_id": "demo-project-STEP-012",
+          "condition": null
+        }
+      ],
+      "evidence_ids": [
+        "demo-project-EVD-019"
+      ],
+      "unknowns": [
+        "actor not stated in source"
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "step_id": "demo-project-STEP-012",
+      "name": "Meet and display awardees list",
+      "actor": "Scholarship Committee",
+      "state": null,
+      "inputs": [],
+      "outputs": [],
+      "next_steps": [],
+      "evidence_ids": [
+        "demo-project-EVD-022",
+        "demo-project-EVD-023"
+      ],
+      "unknowns": []
+    }
+  ],
+  "rules": [
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-001",
+      "statement": "Only eligible students may apply for the scholarship.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-002"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-002",
+      "statement": "A student must be enrolled in a full-time undergraduate programme at the institute.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-003"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-003",
+      "statement": "The student must have a cumulative grade point average (CGPA) of at least 8.0 in the previous academic year.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-004"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-004",
+      "statement": "The annual family income of the student must not exceed 5,00,000 rupees.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-005"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-005",
+      "statement": "Students who have already received another scholarship from the institute in the same academic year cannot apply.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-006"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-006",
+      "statement": "Applications must be submitted before 31 March of each year.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-007"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-007",
+      "statement": "Applications received after this date will not be accepted.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-008"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-008",
+      "statement": "The online application portal opens on 1 February.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-020"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-009",
+      "statement": "The last date to submit the scholarship application is 15 April.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-021"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-010",
+      "statement": "Students are informed about the result through the portal.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-024"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-011",
+      "statement": "Students who are not selected are not sent any separate message.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-025"
+      ],
+      "status": "needs_review"
+    },
+    {
+      "schema_version": "0.1",
+      "rule_id": "demo-project-BR-012",
+      "statement": "Questions about the scholarship should be sent to the Scholarship Office of the institute.",
+      "condition": null,
+      "action": null,
+      "scope": null,
+      "effective_context": null,
+      "evidence_ids": [
+        "demo-project-EVD-026"
+      ],
+      "status": "needs_review"
+    }
+  ],
+  "warnings": []
+}
