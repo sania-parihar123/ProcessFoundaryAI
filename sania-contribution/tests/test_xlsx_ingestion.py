@@ -33,7 +33,7 @@ def test_xlsx_evidence_preserves_worksheet_and_cell_source() -> None:
         ],
     )
     document = extract_document(upload)
-    evidence = extract_evidence(document.sections)
+    evidence = extract_evidence(document.sections, strategy="scholarship_compat")
 
     assert len(evidence) == 1
     item = evidence[0]
@@ -42,6 +42,12 @@ def test_xlsx_evidence_preserves_worksheet_and_cell_source() -> None:
     assert item["cell_references"] == ["A2", "B2"]
     assert "Rules!A2,B2" in item["source_refs"][1]
     assert item["quote"] == "Annual family income must not exceed ₹2,50,000"
+    locator = item["source_locations"][0]
+    source_text = document.sections[1]["text"]
+    assert locator["worksheet_name"] == "Rules"
+    assert locator["row_number"] == 2
+    assert locator["cell_coordinates"] == ["A2", "B2"]
+    assert source_text[locator["char_start"]:locator["char_end"]] == item["quote"]
 
 
 def test_xlsx_formula_is_preserved_and_not_executed() -> None:
@@ -58,6 +64,7 @@ def test_xlsx_formula_is_preserved_and_not_executed() -> None:
     row = document.sections[1]
     assert row["cells"][1]["value"] == "=A2*2"
     assert "=A2*2" in row["text"]
+    assert "calculated_value" not in row["cells"][1]
 
 
 def test_mixed_valid_and_corrupt_xlsx_files_continue_processing() -> None:
@@ -68,7 +75,8 @@ def test_mixed_valid_and_corrupt_xlsx_files_continue_processing() -> None:
                 [["Policy"], ["Minimum attendance of 75% is required."]],
             ),
             Upload("broken.xlsx", b"bad workbook"),
-        ]
+        ],
+        process_type="scholarship",
     )
 
     assert len(result.documents) == 1

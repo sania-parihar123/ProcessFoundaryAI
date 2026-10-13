@@ -42,7 +42,7 @@ def _text_pdf(text: str) -> bytes:
 
 
 def test_txt_preserves_metadata_and_section() -> None:
-    content = b"Annual family income must not exceed Rs. 250000."
+    content = b"First line.\r\nAnnual family income must not exceed Rs. 250000."
     result = extract_document(Upload("policy.txt", content))
 
     assert result.filename == "policy.txt"
@@ -51,6 +51,17 @@ def test_txt_preserves_metadata_and_section() -> None:
     assert result.document_id.startswith("document-")
     assert result.sections[0]["section"] == 1
     assert result.sections[0]["text"] == content.decode()
+    assert result.sections[0]["source_locator"] == {
+        "document_id": result.document_id,
+        "section_id": f"{result.document_id}:section-1",
+        "filename": "policy.txt",
+        "section": 1,
+        "line_start": 1,
+        "line_end": 2,
+        "char_start": 0,
+        "char_end": len(content.decode()),
+        "newline_convention": "CRLF",
+    }
 
 
 def test_docx_has_section_location_but_no_fabricated_page() -> None:
@@ -63,6 +74,34 @@ def test_docx_has_section_location_but_no_fabricated_page() -> None:
 
     assert result.sections[0]["section"] == 1
     assert "page" not in result.sections[0]
+    assert result.sections[0]["source_locator"]["paragraph"] == 1
+    assert "page" not in result.sections[0]["source_locator"]
+
+
+def test_docx_heading_identifier_is_preserved_when_available() -> None:
+    document = Document()
+    heading = document.add_heading("Operations", level=1)
+    buffer = BytesIO()
+    document.save(buffer)
+
+    result = extract_document(Upload("rules.docx", buffer.getvalue()))
+
+    assert result.sections[0]["text"] == heading.text
+    assert result.sections[0]["source_locator"]["heading"] == "Heading 1"
+
+
+def test_docx_paragraph_text_is_preserved_exactly() -> None:
+    document = Document()
+    paragraph = document.add_paragraph("  Exact paragraph text.  ")
+    buffer = BytesIO()
+    document.save(buffer)
+
+    result = extract_document(Upload("rules.docx", buffer.getvalue()))
+
+    section = result.sections[0]
+    assert section["text"] == paragraph.text
+    assert section["source_locator"]["char_start"] == 0
+    assert section["source_locator"]["char_end"] == len(paragraph.text)
 
 
 def test_pdf_preserves_real_page_number() -> None:
@@ -72,6 +111,21 @@ def test_pdf_preserves_real_page_number() -> None:
 
     assert result.sections[0]["page"] == 1
     assert "250000" in result.sections[0]["text"]
+    assert result.sections[0]["source_locator"]["page"] == 1
+    assert result.sections[0]["source_locator"]["char_start"] == 0
+    assert result.sections[0]["source_locator"]["char_end"] == len(
+        result.sections[0]["text"]
+    )
+
+
+def test_same_file_content_has_stable_document_and_locator_references() -> None:
+    content = b"Annual family income must not exceed Rs. 250000."
+
+    first = extract_document(Upload("policy.txt", content))
+    second = extract_document(Upload("policy.txt", content))
+
+    assert first.document_id == second.document_id
+    assert first.sections == second.sections
 
 
 @pytest.mark.parametrize(
@@ -147,10 +201,28 @@ def test_xlsx_extracts_multiple_worksheets_headers_rows_and_coordinates() -> Non
     assert [section["row_number"] for section in eligibility_rows] == [1, 2, 4]
     assert eligibility_rows[1]["headers"] == ["Requirement", "Value"]
     assert eligibility_rows[1]["cells"] == [
-        {"coordinate": "A2", "column": "Requirement", "value": "Annual family income must not exceed"},
-        {"coordinate": "B2", "column": "Value", "value": "₹2,50,000"},
+        {
+            "coordinate": "A2",
+            "column": "Requirement",
+            "value": "Annual family income must not exceed",
+        },
+        {
+            "coordinate": "B2",
+            "column": "Value",
+            "value": "₹2,50,000",
+        },
     ]
     assert "Requirement: Annual family income must not exceed" in eligibility_rows[1]["text"]
+    assert eligibility_rows[1]["source_locator"] == {
+        "document_id": result.document_id,
+        "section_id": f"{result.document_id}:worksheet-Eligibility:row-2",
+        "filename": "policy.xlsx",
+        "worksheet_name": "Eligibility",
+        "row_number": 2,
+        "cell_coordinates": ["A2", "B2"],
+        "char_start": 0,
+        "char_end": len(eligibility_rows[1]["text"]),
+    }
 
 
 def test_xlsx_empty_worksheet_is_preserved_without_fabricated_text() -> None:

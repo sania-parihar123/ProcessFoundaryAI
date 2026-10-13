@@ -11,6 +11,10 @@ from uuid import uuid4
 from app.graph.build_graph import build_graph
 from app.graph.state import ProcessFoundryState
 
+from .generic_workflow_proposal import build_generic_workflow_proposal
+from .scholarship_workflow_compatibility import (
+    build_scholarship_workflow_proposal,
+)
 from .document_ingestion import (
     DEFAULT_MAX_FILE_SIZE_BYTES,
     DocumentIngestionError,
@@ -34,6 +38,7 @@ class IngestionResult:
     evidence_items: list[dict[str, Any]]
     errors: list[UploadError]
     state: ProcessFoundryState | None
+    process_type: str = "generic-process"
 
     @property
     def message(self) -> str:
@@ -42,7 +47,9 @@ class IngestionResult:
         if not self.sections:
             return "Documents were accepted, but no extractable text was found."
         if not self.evidence_items:
-            return "Text was extracted, but no recognized scholarship evidence was found."
+            if self.process_type == "scholarship":
+                return "Text was extracted, but no recognized scholarship evidence was found."
+            return "Text was extracted, but no recognized process evidence was found."
         return f"Extracted {len(self.evidence_items)} evidence item(s) from {len(self.documents)} document(s)."
 
 
@@ -68,170 +75,27 @@ def _workflow_proposal(
     evidence_items: list[dict[str, Any]],
     state: ProcessFoundryState,
 ) -> dict[str, Any]:
-    """Build a reviewable proposal strictly from extracted evidence and issues."""
+    """Build a process-neutral proposal or a legacy scholarship projection."""
 
-    steps: list[dict[str, Any]] = []
-    roles: list[str] = []
-    inputs: list[dict[str, Any]] = []
-    decision_points: list[dict[str, Any]] = []
-    exceptions: list[dict[str, Any]] = []
-    source_refs: set[str] = set()
-
-    for item in evidence_items:
-        assertion = item.get("assertion", {})
-        predicate = assertion.get("predicate")
-        refs = list(item.get("source_refs", []))
-        evidence_id = item["evidence_id"]
-        quote = str(item.get("quote", "")).strip()
-        source_refs.update(refs)
-        if predicate == "enrollment_requirement":
-            steps.append(
-                {
-                    "step": "Verify the applicant's enrollment.",
-                    "description": (
-                        f"Confirm that the applicant meets the stated enrollment "
-                        f"requirement: {quote}"
-                    ),
-                    "supported_by": [evidence_id],
-                    "source_refs": refs,
-                    "requirement": assertion.get("value"),
-                }
-            )
-        elif predicate == "academic_threshold":
-            description = (
-                f"Check the academic threshold stated in the source: {quote}"
-            )
-            decision_points.append(
-                {
-                    "check": "Academic eligibility",
-                    "description": description,
-                    "evidence_refs": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-            steps.append(
-                {
-                    "step": "Check academic eligibility.",
-                    "description": description,
-                    "supported_by": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-        elif predicate == "family_income_limit":
-            description = (
-                f"Check the family or household income limit stated in the source: "
-                f"{quote}"
-            )
-            decision_points.append(
-                {
-                    "check": "Family or household income eligibility",
-                    "description": description,
-                    "claim": str(assertion.get("value", "")),
-                    "evidence_refs": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-            steps.append(
-                {
-                    "step": "Check family or household income eligibility.",
-                    "description": description,
-                    "supported_by": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-        elif predicate == "required_supporting_document":
-            inputs.append(
-                {
-                    "document": assertion.get("value"),
-                    "description": f"Verify the required document: {quote}",
-                    "evidence_refs": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-            steps.append(
-                {
-                    "step": "Collect and verify supporting documents.",
-                    "description": f"Verify the required document: {quote}",
-                    "supported_by": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-        elif predicate == "human_review_responsibility":
-            role = str(assertion.get("value", "")).strip()
-            if role and role not in roles:
-                roles.append(role)
-            steps.append(
-                {
-                    "step": "Conduct human review or final decision.",
-                    "description": f"Follow the responsibility stated in the source: {quote}",
-                    "supported_by": [evidence_id],
-                    "source_refs": refs,
-                    "responsible_role": role,
-                }
-            )
-        if assertion.get("exception"):
-            exceptions.append(
-                {
-                    "description": assertion["exception"],
-                    "evidence_refs": [evidence_id],
-                    "source_refs": refs,
-                }
-            )
-
-    unresolved_questions = [
-        {
-            "issue_id": issue.get("gap_id", issue.get("conflict_id")),
-            "description": issue.get("description", ""),
-            "evidence_refs": list(issue.get("evidence_refs", [])),
-            "source_refs": list(issue.get("source_refs", [])),
-        }
-        for issue in [*state.gap_issues, *state.conflict_issues]
-        if isinstance(issue, dict) and issue.get("status") != "resolved_by_human"
-    ]
-    conflicts = [
-        {
-            "conflict_id": issue.get("conflict_id"),
-            "description": issue.get("description", ""),
-            "competing_assertions": issue.get("competing_assertions", []),
-            "evidence_refs": issue.get("evidence_refs", []),
-            "source_refs": issue.get("source_refs", []),
-        }
-        for issue in state.conflict_issues
-        if isinstance(issue, dict) and issue.get("status") != "resolved_by_human"
-    ]
-    explanation = (
-        "Workflow steps are supported by extracted evidence and remain subject to review."
-        if steps or decision_points or inputs
-        else "A workflow cannot yet be reliably proposed because no supported process requirements were extracted."
+    proposal_id = _proposal_id(evidence_items, state)
+    if state.process_type == "scholarship":
+        return build_scholarship_workflow_proposal(
+            evidence_items,
+            state,
+            proposal_id=proposal_id,
+        )
+    return build_generic_workflow_proposal(
+        evidence_items,
+        state,
+        proposal_id=proposal_id,
     )
-    return {
-        "proposal_id": _proposal_id(evidence_items, state),
-        "status": "draft",
-        "steps": steps,
-        "requirements": [
-            {
-                "description": str(item.get("quote", "")).strip(),
-                "evidence_refs": [item["evidence_id"]],
-                "source_refs": list(item.get("source_refs", [])),
-            }
-            for item in evidence_items
-        ],
-        "roles": roles,
-        "required_inputs": inputs,
-        "decision_points": decision_points,
-        "exceptions": exceptions,
-        "unresolved_questions": unresolved_questions,
-        "conflicts": conflicts,
-        "source_refs": sorted(source_refs),
-        "explanation": explanation,
-    }
 
 
 def ingest_documents(
     uploads: Sequence[Any],
     *,
     project_id: str = "uploaded-project",
-    process_type: str = "scholarship",
+    process_type: str = "generic-process",
     config: dict[str, Any] | None = None,
     max_file_size_bytes: int = DEFAULT_MAX_FILE_SIZE_BYTES,
 ) -> IngestionResult:
@@ -252,7 +116,23 @@ def ingest_documents(
             errors.append(UploadError(str(filename), exc.code, exc.message))
 
     sections = [section for document in documents for section in document.sections]
-    evidence_items = extract_evidence(sections)
+    extraction_config = dict(config or {})
+    strategy = extraction_config.get("extraction_strategy")
+    if strategy is None:
+        strategy = (
+            "scholarship_compat"
+            if process_type == "scholarship"
+            else "generic"
+        )
+    evidence_items = extract_evidence(
+        sections,
+        config=extraction_config,
+        process_description=extraction_config.get("process_description"),
+        vocabulary=extraction_config.get("vocabulary"),
+        required_evidence=extraction_config.get("required_evidence"),
+        expected_process_steps=extraction_config.get("expected_process_steps"),
+        strategy=strategy,
+    )
     state = None
     if documents:
         source_index = {
@@ -277,4 +157,5 @@ def ingest_documents(
         evidence_items=evidence_items,
         errors=errors,
         state=state,
+        process_type=process_type,
     )

@@ -12,6 +12,8 @@ from docx import Document
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
+from app.contracts.evidence import SourceLocator
+
 DEFAULT_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 SUPPORTED_EXTENSIONS = frozenset({".pdf", ".docx", ".txt", ".xlsx"})
 
@@ -81,15 +83,32 @@ def _section(
     filename: str,
     text: str,
     location: dict[str, int],
+    locator: SourceLocator | None = None,
 ) -> dict[str, Any]:
     location_name, location_value = next(iter(location.items()))
-    return {
+    section = {
         "section_id": f"{document_id}:{location_name}-{location_value}",
         "document_id": document_id,
         "filename": filename,
         location_name: location_value,
         "text": text,
     }
+    if locator is not None:
+        section["source_locator"] = locator.model_dump(
+            exclude_none=True,
+            exclude_defaults=True,
+        )
+    return section
+
+
+def _newline_convention(text: str) -> str:
+    if "\r\n" in text:
+        return "CRLF"
+    if "\r" in text:
+        return "CR"
+    if "\n" in text:
+        return "LF"
+    return "none"
 
 
 def _extract_txt(document_id: str, filename: str, content: bytes) -> list[dict[str, Any]]:
@@ -102,7 +121,25 @@ def _extract_txt(document_id: str, filename: str, content: bytes) -> list[dict[s
         ) from exc
     if not text.strip():
         return []
-    return [_section(document_id=document_id, filename=filename, text=text, location={"section": 1})]
+    return [
+        _section(
+            document_id=document_id,
+            filename=filename,
+            text=text,
+            location={"section": 1},
+            locator=SourceLocator(
+                document_id=document_id,
+                section_id=f"{document_id}:section-1",
+                filename=filename,
+                section=1,
+                line_start=1,
+                line_end=len(text.splitlines()) or 1,
+                char_start=0,
+                char_end=len(text),
+                newline_convention=_newline_convention(text),
+            ),
+        )
+    ]
 
 
 def _extract_docx(document_id: str, filename: str, content: bytes) -> list[dict[str, Any]]:
@@ -114,14 +151,28 @@ def _extract_docx(document_id: str, filename: str, content: bytes) -> list[dict[
         ) from exc
     sections: list[dict[str, Any]] = []
     for index, paragraph in enumerate(document.paragraphs, start=1):
-        text = paragraph.text.strip()
-        if text:
+        text = paragraph.text
+        if text.strip():
+            heading = None
+            style_name = getattr(getattr(paragraph, "style", None), "name", None)
+            if isinstance(style_name, str) and style_name.casefold().startswith("heading"):
+                heading = style_name
             sections.append(
                 _section(
                     document_id=document_id,
                     filename=filename,
                     text=text,
                     location={"section": index},
+                    locator=SourceLocator(
+                        document_id=document_id,
+                        section_id=f"{document_id}:section-{index}",
+                        filename=filename,
+                        paragraph=index,
+                        section=index,
+                        char_start=0,
+                        char_end=len(text),
+                        heading=heading,
+                    ),
                 )
             )
     return sections
@@ -132,14 +183,22 @@ def _extract_pdf(document_id: str, filename: str, content: bytes) -> list[dict[s
         reader = PdfReader(BytesIO(content))
         sections = []
         for page_number, page in enumerate(reader.pages, start=1):
-            text = (page.extract_text() or "").strip()
-            if text:
+            text = page.extract_text() or ""
+            if text.strip():
                 sections.append(
                     _section(
                         document_id=document_id,
                         filename=filename,
                         text=text,
                         location={"page": page_number},
+                        locator=SourceLocator(
+                            document_id=document_id,
+                            section_id=f"{document_id}:page-{page_number}",
+                            filename=filename,
+                            page=page_number,
+                            char_start=0,
+                            char_end=len(text),
+                        ),
                     )
                 )
     except Exception as exc:
@@ -171,10 +230,11 @@ def _worksheet_section(
     headers: list[str],
     cells: list[dict[str, Any]],
     text: str,
+    cell_coordinates: list[str],
     empty: bool = False,
 ) -> dict[str, Any]:
     row_part = f"row-{row_number}" if row_number is not None else "empty"
-    return {
+    section = {
         "section_id": f"{document_id}:worksheet-{worksheet_name}:{row_part}",
         "document_id": document_id,
         "filename": filename,
@@ -185,6 +245,17 @@ def _worksheet_section(
         "text": text,
         "worksheet_empty": empty,
     }
+    section["source_locator"] = SourceLocator(
+        document_id=document_id,
+        section_id=section["section_id"],
+        filename=filename,
+        worksheet_name=worksheet_name,
+        row_number=row_number,
+        cell_coordinates=cell_coordinates,
+        char_start=0 if text else None,
+        char_end=len(text) if text else None,
+    ).model_dump(exclude_none=True, exclude_defaults=True)
+    return section
 
 
 def _extract_xlsx(
@@ -223,6 +294,7 @@ def _extract_xlsx(
                         headers=[],
                         cells=[],
                         text="",
+                        cell_coordinates=[],
                         empty=True,
                     )
                 )
@@ -259,6 +331,9 @@ def _extract_xlsx(
                         headers=headers,
                         cells=cells,
                         text="; ".join(pairs),
+                        cell_coordinates=[
+                            cell["coordinate"] for cell in cells
+                        ],
                     )
                 )
     finally:

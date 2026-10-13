@@ -86,6 +86,9 @@ def workflow_view_model(state: ProcessFoundryState) -> dict[str, Any]:
         "project_id": state.project_id,
         "run_id": state.run_id,
         "process_type": state.process_type,
+        "process_description": state.process_description,
+        "process_label": state.config.get("process_label", state.process_type),
+        "demo_label": state.config.get("demo_label"),
         "lifecycle_status": state.lifecycle_status.value,
         "current_node": state.current_node,
         "next_action": state.next_action,
@@ -106,6 +109,12 @@ def workflow_view_model(state: ProcessFoundryState) -> dict[str, Any]:
         ],
         "trace_events": [_trace_view(event) for event in state.trace_events],
         "workflow_proposal": proposal,
+        "evidence_items": [dict(item) for item in state.evidence_items],
+        "source_index": {
+            str(key): dict(value)
+            for key, value in state.source_index.items()
+            if isinstance(value, dict)
+        },
         "proposal_label": (
             "Approved" if proposal_is_approved else "Unapproved proposal"
         ),

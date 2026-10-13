@@ -9,7 +9,13 @@ _DEMO_TIMESTAMP = datetime(2026, 1, 1, 12, tzinfo=timezone.utc)
 
 
 def get_demo_runs() -> list[ProcessFoundryState]:
-    """Return independent demo runs for the disconnected UI shell."""
+    """Return the original scholarship compatibility demos."""
+
+    return _scholarship_demo_runs()
+
+
+def _scholarship_demo_runs() -> list[ProcessFoundryState]:
+    """Return explicitly named legacy scholarship fixtures."""
 
     completed = ProcessFoundryState(
         run_id="demo-run-completed",
@@ -25,7 +31,10 @@ def get_demo_runs() -> list[ProcessFoundryState]:
             "status": "draft",
             "steps": ["Review application", "Record decision"],
         },
-        config={"data_mode": "demo"},
+        config={
+            "data_mode": "demo",
+            "demo_label": "Scholarship compatibility (synthetic)",
+        },
         trace_events=[
             TraceEvent(
                 event_type="node_completed",
@@ -89,6 +98,7 @@ def get_demo_runs() -> list[ProcessFoundryState]:
         ],
         config={
             "data_mode": "demo",
+            "demo_label": "Scholarship compatibility (synthetic)",
             "required_fields": {"rules": ["attendance_threshold"]},
         },
         candidate_business_rules=[
@@ -128,6 +138,302 @@ def get_demo_runs() -> list[ProcessFoundryState]:
         ],
     )
     return [completed, unresolved]
+
+
+def get_generic_demo_runs() -> list[ProcessFoundryState]:
+    """Return synthetic demos for process-neutral UI rendering."""
+
+    purchase = ProcessFoundryState(
+        run_id="demo-run-purchase-approval",
+        project_id="demo-project-purchase",
+        process_type="purchase-approval",
+        process_description="Synthetic purchase approval process demonstration.",
+        lifecycle_status=LifecycleStatus.PAUSED_FOR_HUMAN,
+        current_node="pause_for_human",
+        next_action="await_human_review",
+        evidence_items=[
+            {
+                "evidence_id": "demo-purchase-activity",
+                "kind": "activity",
+                "status": "extracted",
+                "quote": "Employees submit purchase requests through the portal.",
+                "source_refs": ["demo-purchase-policy"],
+                "source_locations": [
+                    {
+                        "document_id": "demo-purchase-policy",
+                        "filename": "purchase-policy.txt",
+                        "line_start": 1,
+                        "line_end": 1,
+                    }
+                ],
+            },
+            {
+                "evidence_id": "demo-purchase-conflict-a",
+                "kind": "requirement",
+                "status": "extracted",
+                "quote": "Requests above USD 5,000 require department approval.",
+                "source_refs": ["demo-purchase-policy"],
+                "source_locations": [
+                    {
+                        "document_id": "demo-purchase-policy",
+                        "filename": "purchase-policy.txt",
+                        "line_start": 2,
+                        "line_end": 2,
+                    }
+                ],
+                "assertion": {
+                    "subject": "purchase.request",
+                    "predicate": "approval_threshold",
+                    "operator": "equals",
+                    "value": 5000,
+                    "unit": "USD",
+                },
+            },
+            {
+                "evidence_id": "demo-purchase-conflict-b",
+                "kind": "requirement",
+                "status": "extracted",
+                "quote": "Requests above USD 7,000 require department approval.",
+                "source_refs": ["demo-purchase-amendment"],
+                "source_locations": [
+                    {
+                        "document_id": "demo-purchase-amendment",
+                        "filename": "purchase-amendment.docx",
+                        "section": 1,
+                    }
+                ],
+                "assertion": {
+                    "subject": "purchase.request",
+                    "predicate": "approval_threshold",
+                    "operator": "equals",
+                    "value": 7000,
+                    "unit": "USD",
+                },
+            },
+        ],
+        conflict_issues=[
+            {
+                "conflict_id": "conflict-demo-purchase-threshold",
+                "conflict_type": "evidence_vs_evidence",
+                "description": "Approval thresholds differ across synthetic sources.",
+                "status": "open",
+                "evidence_refs": [
+                    "demo-purchase-conflict-a",
+                    "demo-purchase-conflict-b",
+                ],
+                "source_refs": [
+                    "demo-purchase-policy",
+                    "demo-purchase-amendment",
+                ],
+                "competing_assertions": [
+                    {
+                        "subject": "purchase.request",
+                        "predicate": "approval_threshold",
+                        "value": 5000,
+                        "unit": "USD",
+                        "evidence_id": "demo-purchase-conflict-a",
+                    },
+                    {
+                        "subject": "purchase.request",
+                        "predicate": "approval_threshold",
+                        "value": 7000,
+                        "unit": "USD",
+                        "evidence_id": "demo-purchase-conflict-b",
+                    },
+                ],
+            }
+        ],
+        workflow_proposal={
+            "proposal_id": "demo-proposal-purchase",
+            "process_type": "purchase-approval",
+            "status": "draft",
+            "steps": [
+                {
+                    "step_id": "demo-purchase-activity",
+                    "title": "Submit purchase requests",
+                    "description": "Employees submit purchase requests through the portal.",
+                    "evidence_refs": ["demo-purchase-activity"],
+                    "source_refs": ["demo-purchase-policy"],
+                }
+            ],
+            "requirements": [
+                {
+                    "description": "Requests above USD 5,000 require department approval.",
+                    "evidence_refs": ["demo-purchase-conflict-a"],
+                    "source_refs": ["demo-purchase-policy"],
+                },
+                {
+                    "description": "Requests above USD 7,000 require department approval.",
+                    "evidence_refs": ["demo-purchase-conflict-b"],
+                    "source_refs": ["demo-purchase-amendment"],
+                },
+            ],
+            "conflicts": [
+                {
+                    "conflict_id": "conflict-demo-purchase-threshold",
+                    "description": "Approval thresholds differ across synthetic sources.",
+                    "evidence_refs": [
+                        "demo-purchase-conflict-a",
+                        "demo-purchase-conflict-b",
+                    ],
+                    "source_refs": [
+                        "demo-purchase-policy",
+                        "demo-purchase-amendment",
+                    ],
+                }
+            ],
+            "unresolved_questions": [
+                {
+                    "issue_id": "conflict-demo-purchase-threshold",
+                    "description": "Which threshold is currently in force?",
+                    "evidence_refs": [
+                        "demo-purchase-conflict-a",
+                        "demo-purchase-conflict-b",
+                    ],
+                    "source_refs": [
+                        "demo-purchase-policy",
+                        "demo-purchase-amendment",
+                    ],
+                }
+            ],
+            "source_refs": [
+                "demo-purchase-policy",
+                "demo-purchase-amendment",
+            ],
+            "explanation": "Synthetic evidence is shown for demonstration only; no threshold was selected.",
+        },
+        config={
+            "data_mode": "demo",
+            "demo_label": "Purchase approval (synthetic)",
+        },
+        source_document_ids=[
+            "demo-purchase-policy",
+            "demo-purchase-amendment",
+        ],
+        source_index={
+            "demo-purchase-policy": {
+                "document_id": "demo-purchase-policy",
+                "filename": "purchase-policy.txt",
+            },
+            "demo-purchase-amendment": {
+                "document_id": "demo-purchase-amendment",
+                "filename": "purchase-amendment.docx",
+            },
+        },
+    )
+    onboarding = ProcessFoundryState(
+        run_id="demo-run-employee-onboarding",
+        project_id="demo-project-onboarding",
+        process_type="employee-onboarding",
+        process_description="Synthetic employee onboarding process demonstration.",
+        lifecycle_status=LifecycleStatus.PAUSED_FOR_HUMAN,
+        current_node="pause_for_human",
+        next_action="await_human_review",
+        gap_issues=[
+            {
+                "gap_id": "gap-demo-onboarding-equipment",
+                "gap_type": "missing_step",
+                "description": "The required equipment-issue step is not documented.",
+                "status": "open",
+                "evidence_refs": [],
+                "source_refs": [],
+            }
+        ],
+        evidence_items=[
+            {
+                "evidence_id": "demo-onboarding-hr",
+                "kind": "activity",
+                "status": "extracted",
+                "quote": "Human Resources creates the employee record.",
+                "actors": [{"label": "Human Resources"}],
+                "source_refs": ["demo-onboarding-guide"],
+                "source_locations": [
+                    {
+                        "document_id": "demo-onboarding-guide",
+                        "filename": "onboarding-guide.docx",
+                        "section": 1,
+                        "heading": "Employee record",
+                    }
+                ],
+            },
+            {
+                "evidence_id": "demo-onboarding-it",
+                "kind": "responsibility",
+                "status": "extracted",
+                "quote": "IT provisions access before the start date.",
+                "actors": [{"label": "IT"}],
+                "source_refs": ["demo-onboarding-guide"],
+                "source_locations": [
+                    {
+                        "document_id": "demo-onboarding-guide",
+                        "filename": "onboarding-guide.docx",
+                        "section": 2,
+                        "heading": "Access",
+                    }
+                ],
+            },
+        ],
+        workflow_proposal={
+            "proposal_id": "demo-proposal-onboarding",
+            "process_type": "employee-onboarding",
+            "status": "draft",
+            "steps": [
+                {
+                    "step_id": "demo-onboarding-hr",
+                    "title": "Create the employee record",
+                    "description": "Human Resources creates the employee record.",
+                    "actors": [{"label": "Human Resources"}],
+                    "evidence_refs": ["demo-onboarding-hr"],
+                    "source_refs": ["demo-onboarding-guide"],
+                },
+                {
+                    "step_id": "demo-onboarding-it",
+                    "title": "Provision access",
+                    "description": "IT provisions access before the start date.",
+                    "actors": [{"label": "IT"}],
+                    "evidence_refs": ["demo-onboarding-it"],
+                    "source_refs": ["demo-onboarding-guide"],
+                },
+            ],
+            "responsibilities": [
+                {
+                    "description": "IT provisions access before the start date.",
+                    "actors": [{"label": "IT"}],
+                    "evidence_refs": ["demo-onboarding-it"],
+                    "source_refs": ["demo-onboarding-guide"],
+                }
+            ],
+            "unresolved_questions": [
+                {
+                    "issue_id": "gap-demo-onboarding-equipment",
+                    "description": "The required equipment-issue step is not documented.",
+                    "evidence_refs": [],
+                    "source_refs": [],
+                }
+            ],
+            "source_refs": ["demo-onboarding-guide"],
+            "explanation": "Synthetic evidence is shown for demonstration only; the missing step remains unresolved.",
+        },
+        source_document_ids=["demo-onboarding-guide"],
+        source_index={
+            "demo-onboarding-guide": {
+                "document_id": "demo-onboarding-guide",
+                "filename": "onboarding-guide.docx",
+            }
+        },
+        config={
+            "data_mode": "demo",
+            "demo_label": "Employee onboarding (synthetic)",
+            "required_process_steps": ["issue equipment"],
+        },
+    )
+    return [purchase, onboarding]
+
+
+def get_all_demo_runs() -> list[ProcessFoundryState]:
+    """Return compatibility scholarship and generic synthetic fixtures."""
+
+    return [*get_demo_runs(), *get_generic_demo_runs()]
 
 
 def get_demo_run(run_id: str) -> ProcessFoundryState:
