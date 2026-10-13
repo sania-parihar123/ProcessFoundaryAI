@@ -145,6 +145,32 @@ def test_default_path_uses_generic_proposal_for_unfamiliar_process() -> None:
     assert "scholarship" not in str(proposal).lower()
 
 
+def test_default_path_extracts_steps_for_multiple_generic_processes() -> None:
+    examples = [
+        (
+            "permit-review.txt",
+            b"Inspectors review permit requests through the online portal. "
+            b"Records staff issue the permit after approval.",
+        ),
+        (
+            "clinic-intake.txt",
+            b"Clinic staff register new patients at reception. "
+            b"Nurses verify the intake form before scheduling an appointment.",
+        ),
+    ]
+
+    for filename, content in examples:
+        result = ingest_documents([Upload(filename, content)])
+
+        assert result.state is not None
+        proposal = result.state.workflow_proposal
+        assert proposal["process_type"] == "generic-process"
+        assert proposal["steps"]
+        assert all(step["evidence_refs"] for step in proposal["steps"])
+        assert all(step["source_refs"] for step in proposal["steps"])
+        assert all(step["source_locations"] for step in proposal["steps"])
+
+
 def test_proposal_is_unapproved_and_provenance_backed() -> None:
     result = ingest_documents(
         [

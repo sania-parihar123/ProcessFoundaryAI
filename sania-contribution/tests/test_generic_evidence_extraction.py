@@ -69,6 +69,52 @@ def test_purchase_approval_uses_generic_kinds_and_exact_quotes() -> None:
         assert item["source_locations"][0]["section"] == 1
 
 
+def test_generic_deadline_matching_requires_temporal_context() -> None:
+    examples = [
+        ("Requests must be submitted within five days.", "deadline"),
+        (
+            "Finance must complete the review within three business days.",
+            "deadline",
+        ),
+        (
+            "Complete the review before the employee start date.",
+            "deadline",
+        ),
+        ("Submit the form by Friday.", "deadline"),
+        ("Submit the form by the end of the month.", "deadline"),
+        (
+            "The application must be approved by an authorized reviewer.",
+            "requirement",
+        ),
+        ("The application is reviewed by the committee.", "activity"),
+    ]
+
+    for text, expected_kind in examples:
+        evidence = extract_evidence([_section(text)], strategy="generic")
+
+        assert len(evidence) == 1
+        assert evidence[0]["kind"] == expected_kind
+        assert text[
+            evidence[0]["quote_char_start"]:evidence[0]["quote_char_end"]
+        ] == text
+        assert evidence[0]["source_refs"] == ["document-generic"]
+        assert evidence[0]["source_locations"][0]["section"] == 1
+
+
+def test_generic_marker_precedence_preserves_activity_condition_and_statement() -> None:
+    examples = [
+        ("Employees submit purchase requests.", "activity"),
+        ("If information is missing, contact the applicant.", "condition"),
+        ("The system stores the submitted request.", "statement"),
+    ]
+
+    for text, expected_kind in examples:
+        evidence = extract_evidence([_section(text)], strategy="generic")
+
+        assert len(evidence) == 1
+        assert evidence[0]["kind"] == expected_kind
+
+
 def test_employee_onboarding_preserves_actors_without_inventing_roles() -> None:
     text = (
         "Human Resources creates the employee record after the signed offer "

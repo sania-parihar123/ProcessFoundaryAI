@@ -128,9 +128,51 @@ _GENERIC_MARKERS = {
     "exception": ("except", "unless", "otherwise"),
     "condition": ("if ", "when ", "provided that", "only when"),
 }
+_DEFAULT_ACTIVITY_VERBS = (
+    "approve",
+    "assign",
+    "assess",
+    "check",
+    "collect",
+    "complete",
+    "create",
+    "escalate",
+    "generate",
+    "identify",
+    "issue",
+    "notify",
+    "prepare",
+    "process",
+    "provision",
+    "record",
+    "register",
+    "review",
+    "route",
+    "schedule",
+    "send",
+    "submit",
+    "update",
+    "validate",
+    "verify",
+)
 _DEADLINE_PATTERN = re.compile(
-    r"\b(?:within|by|before)\s+[^.;,\n]+",
-    re.IGNORECASE,
+    r"""
+    (?:
+        \bwithin\s+
+        (?:\d+(?:\.\d+)?|a|an|one|two|three|four|five|six|seven|eight|nine|ten)
+        \s+
+        (?:(?:business|calendar)\s+)?
+        (?:second|minute|hour|day|week|month|year)s?\b
+      |
+        \bbefore\s+(?=[^.;,\n]*(?:\bdate\b|\bday\b|\bweek\b|\bmonth\b|
+        \byear\b|\bdeadline\b|\bstart\b|\bend\b))[^.;,\n]+
+      |
+        \bby\s+(?=[^.;,\n]*(?:\b(?:monday|tuesday|wednesday|thursday|
+        friday|saturday|sunday)\b|\bdate\b|\bday\b|\bweek\b|\bmonth\b|
+        \byear\b|\bdeadline\b|\bend\b))[^.;,\n]+
+    )
+    """,
+    flags=re.IGNORECASE | re.VERBOSE,
 )
 _ACTOR_BY_PATTERN = re.compile(r"\bby\s+([^.;,\n]+)", re.IGNORECASE)
 
@@ -223,7 +265,10 @@ def _generic_kind(
     ) or _GENERIC_MARKERS["decision"]
     if _contains_marker(quote, decision_markers):
         return "decision"
-    activity_verbs = _configured_terms(configuration, vocabulary, "activity_verbs")
+    activity_verbs = (
+        _configured_terms(configuration, vocabulary, "activity_verbs")
+        or _DEFAULT_ACTIVITY_VERBS
+    )
     if any(
         re.search(rf"\b{re.escape(verb)}(?:s|es|ed|ing)?\b", quote, re.IGNORECASE)
         for verb in activity_verbs
@@ -275,7 +320,10 @@ def _generic_assertion(
             "operator": "alternate_path",
             "value": quote,
         }
-    activity_verbs = _configured_terms(configuration, vocabulary, "activity_verbs")
+    activity_verbs = (
+        _configured_terms(configuration, vocabulary, "activity_verbs")
+        or _DEFAULT_ACTIVITY_VERBS
+    )
     if activity_verbs and any(
         re.search(rf"\b{re.escape(verb)}(?:s|es|ed|ing)?\b", quote, re.IGNORECASE)
         for verb in activity_verbs
