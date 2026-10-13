@@ -24,3 +24,6 @@ venv/
 *.sqlite3/
 uploads/
 chroma_db/
+# Local database backups
+*.dump
+schema_backup.sql

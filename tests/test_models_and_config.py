@@ -83,17 +83,39 @@ def test_database_config_from_env(monkeypatch):
 
     config = DatabaseConfig.from_env()
     assert config.dsn == test_dsn
+    assert config.sqlalchemy_dsn == (
+        "postgresql+psycopg://user:pass@localhost:5432/processfoundry"
+    )
+
+
+def test_database_config_preserves_psycopg_driver_prefix() -> None:
+    """Test that an already-qualified psycopg URL is not rewritten."""
+    dsn = "postgresql+psycopg://user:pass@localhost:5432/processfoundry"
+    config = DatabaseConfig(dsn=dsn)
+    assert config.sqlalchemy_dsn == dsn
+
+
+def test_sqlite_dsn_is_not_rewritten() -> None:
+    """Test that SQLite URLs stay unchanged for tests."""
+    config = DatabaseConfig(dsn="sqlite:///:memory:")
+    assert config.sqlalchemy_dsn == "sqlite:///:memory:"
+
 
 
 def test_database_config_missing_env(monkeypatch) -> None:
     """Test that DatabaseConfig.from_env raises error when env var is missing."""
     monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setattr(
+        "processfoundry_ai.database.config._load_project_env",
+        lambda: None,
+    )
 
     try:
         DatabaseConfig.from_env()
         assert False, "Expected ValueError for missing DATABASE_URL"
     except ValueError as e:
         assert "DATABASE_URL" in str(e)
+
 
 
 if __name__ == "__main__":

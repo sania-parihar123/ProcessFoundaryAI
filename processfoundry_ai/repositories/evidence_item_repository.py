@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import psycopg
-from psycopg import Error as PsycopgError
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from processfoundry_ai.database.config import DatabaseConfig
-from processfoundry_ai.database.connection import get_connection
+from processfoundry_ai.database.models import EvidenceItem as EvidenceItemORM
+from processfoundry_ai.database.session import session_context
 from processfoundry_ai.models.evidence_item import EvidenceItemCreate, EvidenceItemRead
 
 
@@ -31,42 +32,21 @@ class EvidenceItemRepository:
             Created evidence item as EvidenceItemRead model.
 
         Raises:
-            PsycopgError: If database operation fails or foreign key constraint is violated.
+            SQLAlchemyError: If database operation fails or foreign key constraint is violated.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO evidence_items
-                    (id, project_id, document_section_id, quote, claim_type, confidence)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    RETURNING id, project_id, document_section_id, quote, claim_type, confidence
-                    """,
-                    (
-                        item.id,
-                        item.project_id,
-                        item.document_section_id,
-                        item.quote,
-                        item.claim_type,
-                        item.confidence,
-                    ),
-                )
-                row = cur.fetchone()
-            conn.commit()
-
-            if row is None:
-                raise PsycopgError("Failed to insert evidence item (no result returned)")
-
-            return EvidenceItemRead(**row)
-        except PsycopgError as e:
-            if conn:
-                conn.rollback()
-            raise PsycopgError(f"Failed to create evidence item: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+        with session_context(self.config) as session:
+            orm_item = EvidenceItemORM(
+                id=item.id,
+                project_id=item.project_id,
+                document_section_id=item.document_section_id,
+                quote=item.quote,
+                claim_type=item.claim_type,
+                confidence=item.confidence,
+            )
+            session.add(orm_item)
+            session.commit()
+            session.refresh(orm_item)
+            return EvidenceItemRead.model_validate(orm_item)
 
     def get_by_id(self, item_id: str) -> EvidenceItemRead | None:
         """Get evidence item by ID.
@@ -78,35 +58,19 @@ class EvidenceItemRepository:
             EvidenceItemRead if found, None otherwise.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, project_id, document_section_id, quote, claim_type, confidence
-                    FROM evidence_items
-                    WHERE id = %s
-                    """,
-                    (item_id,),
-                )
-                row = cur.fetchone()
-            conn.commit()
+        with session_context(self.config) as session:
+            stmt = select(EvidenceItemORM).where(EvidenceItemORM.id == item_id)
+            orm_item = session.scalars(stmt).first()
 
-            if row is None:
+            if orm_item is None:
                 return None
 
-            return EvidenceItemRead(**row)
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to retrieve evidence item: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+            return EvidenceItemRead.model_validate(orm_item)
 
     def list_by_project(self, project_id: str) -> list[EvidenceItemRead]:
-        """List all evidence items for a project.
+        """List all evidence items for a project ordered by claim type.
 
         Args:
             project_id: Project ID to filter by.
@@ -115,33 +79,19 @@ class EvidenceItemRepository:
             List of evidence items for the project as EvidenceItemRead models.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, project_id, document_section_id, quote, claim_type, confidence
-                    FROM evidence_items
-                    WHERE project_id = %s
-                    ORDER BY claim_type
-                    """,
-                    (project_id,),
-                )
-                rows = cur.fetchall()
-            conn.commit()
-
-            return [EvidenceItemRead(**row) for row in rows]
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to list evidence items for project: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+        with session_context(self.config) as session:
+            stmt = (
+                select(EvidenceItemORM)
+                .where(EvidenceItemORM.project_id == project_id)
+                .order_by(EvidenceItemORM.claim_type)
+            )
+            orm_items = session.scalars(stmt).all()
+            return [EvidenceItemRead.model_validate(i) for i in orm_items]
 
     def list_by_document_section(self, section_id: str) -> list[EvidenceItemRead]:
-        """List all evidence items for a document section (traceability).
+        """List all evidence items for a document section ordered by confidence descending.
 
         Args:
             section_id: Document section ID to filter by.
@@ -150,27 +100,59 @@ class EvidenceItemRepository:
             List of evidence items supporting the section as EvidenceItemRead models.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, project_id, document_section_id, quote, claim_type, confidence
-                    FROM evidence_items
-                    WHERE document_section_id = %s
-                    ORDER BY confidence DESC
-                    """,
-                    (section_id,),
-                )
-                rows = cur.fetchall()
-            conn.commit()
+        with session_context(self.config) as session:
+            stmt = (
+                select(EvidenceItemORM)
+                .where(EvidenceItemORM.document_section_id == section_id)
+                .order_by(EvidenceItemORM.confidence.desc())
+            )
+            orm_items = session.scalars(stmt).all()
+            return [EvidenceItemRead.model_validate(i) for i in orm_items]
 
-            return [EvidenceItemRead(**row) for row in rows]
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to list evidence items for section: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+    def update(self, item_id: str, updates: dict) -> EvidenceItemRead | None:
+        """Update an evidence item by ID.
+
+        Args:
+            item_id: Evidence item ID to update.
+            updates: Dictionary of fields to update with their new values.
+
+        Returns:
+            Updated evidence item as EvidenceItemRead model, or None if not found.
+
+        Raises:
+            SQLAlchemyError: If database operation fails.
+        """
+        with session_context(self.config) as session:
+            orm_item = session.get(EvidenceItemORM, item_id)
+            if orm_item is None:
+                return None
+
+            for field, value in updates.items():
+                if value is not None and hasattr(orm_item, field):
+                    setattr(orm_item, field, value)
+
+            session.commit()
+            session.refresh(orm_item)
+            return EvidenceItemRead.model_validate(orm_item)
+
+    def delete(self, item_id: str) -> bool:
+        """Delete an evidence item by ID.
+
+        Args:
+            item_id: Evidence item ID to delete.
+
+        Returns:
+            True if the item was deleted, False if not found.
+
+        Raises:
+            SQLAlchemyError: If database operation fails.
+        """
+        with session_context(self.config) as session:
+            orm_item = session.get(EvidenceItemORM, item_id)
+            if orm_item is None:
+                return False
+            session.delete(orm_item)
+            session.commit()
+            return True

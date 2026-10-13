@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import psycopg
-from psycopg import Error as PsycopgError
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from processfoundry_ai.database.config import DatabaseConfig
-from processfoundry_ai.database.connection import get_connection
+from processfoundry_ai.database.models import Document as DocumentORM
+from processfoundry_ai.database.session import session_context
 from processfoundry_ai.models.document import DocumentCreate, DocumentRead
 
 
@@ -31,43 +32,22 @@ class DocumentRepository:
             Created document as DocumentRead model.
 
         Raises:
-            PsycopgError: If database operation fails or foreign key constraint is violated.
+            SQLAlchemyError: If database operation fails or foreign key constraint is violated.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO documents
-                    (id, project_id, filename, mime_type, checksum, version, storage_path)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                    RETURNING id, project_id, filename, mime_type, checksum, version, storage_path
-                    """,
-                    (
-                        document.id,
-                        document.project_id,
-                        document.filename,
-                        document.mime_type,
-                        document.checksum,
-                        document.version,
-                        document.storage_path,
-                    ),
-                )
-                row = cur.fetchone()
-            conn.commit()
-
-            if row is None:
-                raise PsycopgError("Failed to insert document (no result returned)")
-
-            return DocumentRead(**row)
-        except PsycopgError as e:
-            if conn:
-                conn.rollback()
-            raise PsycopgError(f"Failed to create document: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+        with session_context(self.config) as session:
+            orm_document = DocumentORM(
+                id=document.id,
+                project_id=document.project_id,
+                filename=document.filename,
+                mime_type=document.mime_type,
+                checksum=document.checksum,
+                version=document.version,
+                storage_path=document.storage_path,
+            )
+            session.add(orm_document)
+            session.commit()
+            session.refresh(orm_document)
+            return DocumentRead.model_validate(orm_document)
 
     def get_by_id(self, document_id: str) -> DocumentRead | None:
         """Get document by ID.
@@ -79,64 +59,88 @@ class DocumentRepository:
             DocumentRead if found, None otherwise.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, project_id, filename, mime_type, checksum, version, storage_path
-                    FROM documents
-                    WHERE id = %s
-                    """,
-                    (document_id,),
-                )
-                row = cur.fetchone()
-            conn.commit()
+        with session_context(self.config) as session:
+            stmt = select(DocumentORM).where(DocumentORM.id == document_id)
+            orm_document = session.scalars(stmt).first()
 
-            if row is None:
+            if orm_document is None:
                 return None
 
-            return DocumentRead(**row)
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to retrieve document: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+            return DocumentRead.model_validate(orm_document)
 
-    def list_by_project(self, project_id: str) -> list[DocumentRead]:
-        """List all documents for a project.
+    def list_by_project(
+        self, project_id: str, limit: int | None = None, offset: int = 0
+    ) -> list[DocumentRead]:
+        """List all documents for a project ordered by filename.
 
         Args:
             project_id: Project ID to filter by.
+            limit: Maximum number of documents to return (for pagination).
+            offset: Number of documents to skip before starting to collect the result set (for pagination).
 
         Returns:
             List of documents for the project as DocumentRead models.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, project_id, filename, mime_type, checksum, version, storage_path
-                    FROM documents
-                    WHERE project_id = %s
-                    ORDER BY filename
-                    """,
-                    (project_id,),
-                )
-                rows = cur.fetchall()
-            conn.commit()
+        with session_context(self.config) as session:
+            stmt = (
+                select(DocumentORM)
+                .where(DocumentORM.project_id == project_id)
+                .order_by(DocumentORM.filename)
+            )
+            if offset:
+                stmt = stmt.offset(offset)
+            if limit is not None:
+                stmt = stmt.limit(limit)
+            orm_documents = session.scalars(stmt).all()
+            return [DocumentRead.model_validate(d) for d in orm_documents]
 
-            return [DocumentRead(**row) for row in rows]
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to list documents for project: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+    def update(self, document_id: str, updates: dict) -> DocumentRead | None:
+        """Update a document by ID.
+
+        Args:
+            document_id: Document ID to update.
+            updates: Dictionary of fields and values to update.
+
+        Returns:
+            Updated document as DocumentRead model, or None if not found.
+
+        Raises:
+            SQLAlchemyError: If database operation fails.
+        """
+        with session_context(self.config) as session:
+            orm_document = session.get(DocumentORM, document_id)
+            if orm_document is None:
+                return None
+
+            for field, value in updates.items():
+                if value is not None and hasattr(orm_document, field):
+                    setattr(orm_document, field, value)
+
+            session.commit()
+            session.refresh(orm_document)
+            return DocumentRead.model_validate(orm_document)
+
+    def delete(self, document_id: str) -> bool:
+        """Delete a document by ID.
+
+        Args:
+            document_id: Document ID to delete.
+
+        Returns:
+            True if the document was deleted, False if not found.
+
+        Raises:
+            SQLAlchemyError: If database operation fails.
+        """
+        with session_context(self.config) as session:
+            orm_document = session.get(DocumentORM, document_id)
+            if orm_document is None:
+                return False
+            session.delete(orm_document)
+            session.commit()
+            return True

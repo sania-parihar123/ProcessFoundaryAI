@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import psycopg
-from psycopg import Error as PsycopgError
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from processfoundry_ai.database.config import DatabaseConfig
-from processfoundry_ai.database.connection import get_connection
+from processfoundry_ai.database.models import DocumentSection as DocumentSectionORM
+from processfoundry_ai.database.session import session_context
 from processfoundry_ai.models.document_section import (
     DocumentSectionCreate,
     DocumentSectionRead,
@@ -34,41 +35,20 @@ class DocumentSectionRepository:
             Created section as DocumentSectionRead model.
 
         Raises:
-            PsycopgError: If database operation fails or foreign key constraint is violated.
+            SQLAlchemyError: If database operation fails or foreign key constraint is violated.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    INSERT INTO document_sections
-                    (id, document_id, page_number, section_title, text)
-                    VALUES (%s, %s, %s, %s, %s)
-                    RETURNING id, document_id, page_number, section_title, text
-                    """,
-                    (
-                        section.id,
-                        section.document_id,
-                        section.page_number,
-                        section.section_title,
-                        section.text,
-                    ),
-                )
-                row = cur.fetchone()
-            conn.commit()
-
-            if row is None:
-                raise PsycopgError("Failed to insert document section (no result returned)")
-
-            return DocumentSectionRead(**row)
-        except PsycopgError as e:
-            if conn:
-                conn.rollback()
-            raise PsycopgError(f"Failed to create document section: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+        with session_context(self.config) as session:
+            orm_section = DocumentSectionORM(
+                id=section.id,
+                document_id=section.document_id,
+                page_number=section.page_number,
+                section_title=section.section_title,
+                text=section.text,
+            )
+            session.add(orm_section)
+            session.commit()
+            session.refresh(orm_section)
+            return DocumentSectionRead.model_validate(orm_section)
 
     def get_by_id(self, section_id: str) -> DocumentSectionRead | None:
         """Get document section by ID.
@@ -80,35 +60,21 @@ class DocumentSectionRepository:
             DocumentSectionRead if found, None otherwise.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, document_id, page_number, section_title, text
-                    FROM document_sections
-                    WHERE id = %s
-                    """,
-                    (section_id,),
-                )
-                row = cur.fetchone()
-            conn.commit()
+        with session_context(self.config) as session:
+            stmt = select(DocumentSectionORM).where(
+                DocumentSectionORM.id == section_id
+            )
+            orm_section = session.scalars(stmt).first()
 
-            if row is None:
+            if orm_section is None:
                 return None
 
-            return DocumentSectionRead(**row)
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to retrieve document section: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+            return DocumentSectionRead.model_validate(orm_section)
 
     def list_by_document(self, document_id: str) -> list[DocumentSectionRead]:
-        """List all sections for a document.
+        """List all sections for a document ordered by page number and section title.
 
         Args:
             document_id: Document ID to filter by.
@@ -117,27 +83,61 @@ class DocumentSectionRepository:
             List of sections for the document as DocumentSectionRead models.
 
         Raises:
-            PsycopgError: If database operation fails.
+            SQLAlchemyError: If database operation fails.
         """
-        conn = None
-        try:
-            conn = get_connection(self.config)
-            with conn.cursor() as cur:
-                cur.execute(
-                    """
-                    SELECT id, document_id, page_number, section_title, text
-                    FROM document_sections
-                    WHERE document_id = %s
-                    ORDER BY page_number, section_title
-                    """,
-                    (document_id,),
+        with session_context(self.config) as session:
+            stmt = (
+                select(DocumentSectionORM)
+                .where(DocumentSectionORM.document_id == document_id)
+                .order_by(
+                    DocumentSectionORM.page_number, DocumentSectionORM.section_title
                 )
-                rows = cur.fetchall()
-            conn.commit()
+            )
+            orm_sections = session.scalars(stmt).all()
+            return [DocumentSectionRead.model_validate(s) for s in orm_sections]
 
-            return [DocumentSectionRead(**row) for row in rows]
-        except PsycopgError as e:
-            raise PsycopgError(f"Failed to list document sections: {e}") from e
-        finally:
-            if conn:
-                conn.close()
+    def update(self, section_id: str, updates: dict) -> DocumentSectionRead | None:
+        """Update a document section by ID.
+
+        Args:
+            section_id: Document section ID to update.
+            updates: Dictionary of fields and values to update.
+
+        Returns:
+            Updated section as DocumentSectionRead model, or None if not found.
+
+        Raises:
+            SQLAlchemyError: If database operation fails.
+        """
+        with session_context(self.config) as session:
+            orm_section = session.get(DocumentSectionORM, section_id)
+            if orm_section is None:
+                return None
+
+            for field, value in updates.items():
+                if value is not None and hasattr(orm_section, field):
+                    setattr(orm_section, field, value)
+
+            session.commit()
+            session.refresh(orm_section)
+            return DocumentSectionRead.model_validate(orm_section)
+
+    def delete(self, section_id: str) -> bool:
+        """Delete a document section by ID.
+
+        Args:
+            section_id: Document section ID to delete.
+
+        Returns:
+            True if deleted, False if not found.
+
+        Raises:
+            SQLAlchemyError: If database operation fails.
+        """
+        with session_context(self.config) as session:
+            orm_section = session.get(DocumentSectionORM, section_id)
+            if orm_section is None:
+                return False
+            session.delete(orm_section)
+            session.commit()
+            return True
