@@ -21,7 +21,11 @@ def main() -> None:
         initial_sidebar_state="expanded",
     )
     _apply_theme(st)
-    _render_sidebar(st)
+    navigation = _render_sidebar(st)
+
+    if navigation == "Projects":
+        _render_projects_page(st)
+        return
 
     st.markdown(
         '<div class="eyebrow">PROCESS DISCOVERY WORKSPACE</div>',
@@ -153,7 +157,7 @@ def _apply_theme(st: Any) -> None:
     )
 
 
-def _render_sidebar(st: Any) -> None:
+def _render_sidebar(st: Any) -> str:
     with st.sidebar:
         st.markdown(
             """
@@ -168,9 +172,9 @@ def _render_sidebar(st: Any) -> None:
             unsafe_allow_html=True,
         )
         st.caption("WORKSPACE")
-        st.radio(
+        navigation = st.radio(
             "Workspace navigation",
-            ["Discovery", "Sources", "Workflow"],
+            ["Discovery", "Projects", "Sources", "Workflow"],
             index=0,
             label_visibility="collapsed",
         )
@@ -180,6 +184,61 @@ def _render_sidebar(st: Any) -> None:
             "Local, in-memory analysis. No persistence, authentication, "
             "live backend, or automatic approval is connected."
         )
+    return navigation
+
+
+def _render_projects_page(st: Any) -> None:
+    st.markdown('<div class="eyebrow">PROJECTS</div>', unsafe_allow_html=True)
+    st.title("Projects")
+    st.caption(
+        "Create lightweight project records for this session. Temporary "
+        "storage only — projects are not saved to a database."
+    )
+
+    if "projects" not in st.session_state:
+        st.session_state.projects = []
+
+    with st.form("project_form", clear_on_submit=True):
+        project_name = st.text_input("Project Name")
+        process_type = st.text_input("Process Type")
+        description = st.text_area("Description")
+        submitted = st.form_submit_button(
+            "Save project",
+            type="primary",
+            icon=":material/add:",
+        )
+
+    if submitted:
+        missing_fields = []
+        if not project_name.strip():
+            missing_fields.append("Project Name")
+        if not process_type.strip():
+            missing_fields.append("Process Type")
+
+        if missing_fields:
+            st.error(
+                "Please provide: " + ", ".join(missing_fields) + ".",
+                icon=":material/error:",
+            )
+        else:
+            st.session_state.projects.append(
+                {
+                    "Project Name": project_name.strip(),
+                    "Process Type": process_type.strip(),
+                    "Description": description.strip(),
+                }
+            )
+            st.success("Project saved for this session.", icon=":material/check:")
+
+    st.markdown("### Saved projects")
+    if st.session_state.projects:
+        st.dataframe(
+            st.session_state.projects,
+            hide_index=True,
+            width="stretch",
+        )
+    else:
+        st.info("No projects saved in this session yet.")
 
 
 def _render_demo_workspace(st: Any) -> None:
