@@ -12,11 +12,15 @@ from processfoundry_ai.models.rule_evidence import RuleEvidenceCreate, RuleEvide
 from processfoundry_ai.repositories.artifact_link_repository import ArtifactLinkRepository
 from processfoundry_ai.repositories.artifact_repository import ArtifactRepository
 from processfoundry_ai.repositories.business_rule_repository import BusinessRuleRepository
+from processfoundry_ai.repositories.document_repository import DocumentRepository
 from processfoundry_ai.repositories.evidence_item_repository import EvidenceItemRepository
+from processfoundry_ai.repositories.process_step_repository import ProcessStepRepository
+from processfoundry_ai.repositories.process_version_repository import ProcessVersionRepository
 from processfoundry_ai.repositories.project_repository import ProjectRepository
 from processfoundry_ai.repositories.requirement_link_repository import RequirementLinkRepository
 from processfoundry_ai.repositories.requirement_repository import RequirementRepository
 from processfoundry_ai.repositories.rule_evidence_repository import RuleEvidenceRepository
+from processfoundry_ai.repositories.test_case_repository import TestCaseRepository
 
 rule_evidence_router = APIRouter()
 requirement_links_router = APIRouter()
@@ -191,12 +195,24 @@ def get_project_traceability(project_id: str):
     rules = BusinessRuleRepository(config).list_by_project(project_id)
     requirements = RequirementRepository(config).list_by_project(project_id)
     artifacts = ArtifactRepository(config).list_by_project(project_id)
+    test_cases = TestCaseRepository(config).list_by_project(project_id)
+    process_versions = ProcessVersionRepository(config).list_by_project(project_id)
+    process_steps = []
+    step_repo = ProcessStepRepository(config)
+    for pv in process_versions:
+        process_steps.extend(step_repo.list_by_process_version(pv.id))
+    documents = DocumentRepository(config).list_by_project(project_id)
+
     traceability = {
         "project_id": project_id,
         "evidence_items": [item.model_dump() for item in evidence],
         "business_rules": [rule.model_dump() for rule in rules],
         "requirements": [requirement.model_dump() for requirement in requirements],
         "artifacts": [artifact.model_dump() for artifact in artifacts],
+        "test_cases": [tc.model_dump() for tc in test_cases],
+        "process_versions": [pv.model_dump() for pv in process_versions],
+        "process_steps": [ps.model_dump() for ps in process_steps],
+        "documents": [doc.model_dump() for doc in documents],
     }
 
     rule_links = []

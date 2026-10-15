@@ -200,11 +200,11 @@ def delete_process_version(project_id: str, process_version_id: str):
     response_model=ProcessStepRead,
     status_code=status.HTTP_201_CREATED,
 )
-def create_process_step(process_version_id: str, item: ProcessStepCreateRequest):
+def create_process_step(project_id: str, process_version_id: str, item: ProcessStepCreateRequest):
     config = get_db_config()
     version = ProcessVersionRepository(config).get_by_id(process_version_id)
-    if version is None:
-        raise HTTPException(status_code=404, detail="Process version not found.")
+    if version is None or version.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Process version not found for this project.")
 
     payload = ProcessStepCreate(
         id=str(uuid4()),
@@ -219,33 +219,38 @@ def create_process_step(process_version_id: str, item: ProcessStepCreateRequest)
 
 
 @process_steps_router.get("", response_model=list[ProcessStepRead])
-def list_process_steps(process_version_id: str, limit: int = Query(default=100, ge=1), offset: int = Query(default=0, ge=0)):
+def list_process_steps(project_id: str, process_version_id: str, limit: int = Query(default=100, ge=1), offset: int = Query(default=0, ge=0)):
     config = get_db_config()
-    if ProcessVersionRepository(config).get_by_id(process_version_id) is None:
-        raise HTTPException(status_code=404, detail="Process version not found.")
+    version = ProcessVersionRepository(config).get_by_id(process_version_id)
+    if version is None or version.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Process version not found for this project.")
 
     steps = ProcessStepRepository(config).list_by_process_version(process_version_id)
     return steps[offset: offset + limit]
 
 
 @process_steps_router.get("/{step_id}", response_model=ProcessStepRead)
-def get_process_step(process_version_id: str, step_id: str):
+def get_process_step(project_id: str, process_version_id: str, step_id: str):
     config = get_db_config()
+    version = ProcessVersionRepository(config).get_by_id(process_version_id)
+    if version is None or version.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Process version not found for this project.")
+
     step = ProcessStepRepository(config).get_by_id(step_id)
-    if step is None:
-        raise HTTPException(status_code=404, detail="Process step not found.")
-    if step.process_version_id != process_version_id:
+    if step is None or step.process_version_id != process_version_id:
         raise HTTPException(status_code=404, detail="Process step not found for this process version.")
     return step
 
 
 @process_steps_router.patch("/{step_id}", response_model=ProcessStepRead)
-def update_process_step(process_version_id: str, step_id: str, item: ProcessStepCreateRequest):
+def update_process_step(project_id: str, process_version_id: str, step_id: str, item: ProcessStepCreateRequest):
     config = get_db_config()
+    version = ProcessVersionRepository(config).get_by_id(process_version_id)
+    if version is None or version.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Process version not found for this project.")
+
     current = ProcessStepRepository(config).get_by_id(step_id)
-    if current is None:
-        raise HTTPException(status_code=404, detail="Process step not found.")
-    if current.process_version_id != process_version_id:
+    if current is None or current.process_version_id != process_version_id:
         raise HTTPException(status_code=404, detail="Process step not found for this process version.")
 
     updates = {
@@ -256,16 +261,20 @@ def update_process_step(process_version_id: str, step_id: str, item: ProcessStep
         "sequence": item.sequence,
     }
     updated = ProcessStepRepository(config).update(step_id, updates)
-    return updated or (_ for _ in ()).throw(HTTPException(status_code=404, detail="Process step not found."))
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Process step not found.")
+    return updated
 
 
 @process_steps_router.delete("/{step_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_process_step(process_version_id: str, step_id: str):
+def delete_process_step(project_id: str, process_version_id: str, step_id: str):
     config = get_db_config()
+    version = ProcessVersionRepository(config).get_by_id(process_version_id)
+    if version is None or version.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Process version not found for this project.")
+
     current = ProcessStepRepository(config).get_by_id(step_id)
-    if current is None:
-        raise HTTPException(status_code=404, detail="Process step not found.")
-    if current.process_version_id != process_version_id:
+    if current is None or current.process_version_id != process_version_id:
         raise HTTPException(status_code=404, detail="Process step not found for this process version.")
 
     deleted = ProcessStepRepository(config).delete(step_id)

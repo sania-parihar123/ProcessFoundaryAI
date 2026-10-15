@@ -34,6 +34,7 @@ MIME_TYPES = {
         "spreadsheetml.sheet"
     ),
     ".xls": "application/vnd.ms-excel",
+    ".txt": "text/plain",
 }
 
 ALLOWED_EXTENSIONS = set(MIME_TYPES)
@@ -52,7 +53,7 @@ def validate_file(filename: str, content: bytes) -> str:
     if extension not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=415,
-            detail="Supported file types: PDF, DOCX, XLSX, and XLS.",
+            detail="Supported file types: PDF, DOCX, TXT, XLSX, and XLS.",
         )
 
     if not content:
@@ -87,6 +88,18 @@ def validate_file(filename: str, content: bytes) -> str:
             status_code=400,
             detail="The uploaded file does not look like an XLS file.",
         )
+
+    if extension == ".txt":
+        try:
+            content.decode("utf-8")
+        except UnicodeDecodeError:
+            try:
+                content.decode("latin-1")
+            except Exception:
+                raise HTTPException(
+                    status_code=400,
+                    detail="The uploaded file does not look like valid text.",
+                )
 
     return extension
 

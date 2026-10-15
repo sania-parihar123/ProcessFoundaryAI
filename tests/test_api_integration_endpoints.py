@@ -261,9 +261,17 @@ def test_documents_endpoint_group(api_client):
     assert documents_response.status_code == 200
     assert len(documents_response.json()) == 1
 
+    # Valid .txt upload succeeds
+    txt_response = client.post(
+        f"/api/projects/{project['id']}/documents",
+        files={"file": ("notes.txt", b"Student admissions process details.", "text/plain")},
+    )
+    assert txt_response.status_code == 201
+    assert txt_response.json()["filename"] == "notes.txt"
+
     bad_type_response = client.post(
         f"/api/projects/{project['id']}/documents",
-        files={"file": ("bad.txt", b"not-a-pdf", "text/plain")},
+        files={"file": ("bad.bin", b"\x00\x01\x02\x03", "application/octet-stream")},
     )
     assert bad_type_response.status_code == 415
 

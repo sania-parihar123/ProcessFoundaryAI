@@ -30,6 +30,20 @@ from processfoundry_ai.api.routes.traceability_links import (
     rule_evidence_router,
     traceability_router,
 )
+from processfoundry_ai.api.routes.questions import (
+    project_questions_router,
+    questions_router,
+)
+from processfoundry_ai.api.routes.runs import (
+    project_runs_router,
+    runs_router,
+)
+from processfoundry_ai.api.routes.process_decisions import (
+    process_decisions_router,
+)
+from processfoundry_ai.api.routes.artifacts import (
+    artifacts_api_router,
+)
 
 app = FastAPI(
     title="ProcessFoundry AI API",
@@ -124,6 +138,38 @@ app.include_router(
     traceability_router,
     prefix="/api/projects/{project_id}",
     tags=["Traceability"],
+)
+
+# Canonical API routes from Design Specification (Section 13)
+app.include_router(
+    project_questions_router,
+    prefix="/api/projects/{project_id}/questions",
+    tags=["Clarification Questions"],
+)
+app.include_router(
+    questions_router,
+    prefix="/api/questions",
+    tags=["Clarification Questions"],
+)
+app.include_router(
+    project_runs_router,
+    prefix="/api/projects/{project_id}/runs",
+    tags=["AI Runs"],
+)
+app.include_router(
+    runs_router,
+    prefix="/api/runs",
+    tags=["AI Runs"],
+)
+app.include_router(
+    process_decisions_router,
+    prefix="/api/process-versions",
+    tags=["Process Approval"],
+)
+app.include_router(
+    artifacts_api_router,
+    prefix="/api/artifacts",
+    tags=["Artifacts"],
 )
 
 
